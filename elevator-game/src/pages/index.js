@@ -1,72 +1,96 @@
 import { ArrowUp, ArrowDown, Upload } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { MinPriorityQueue } from "@datastructures-js/priority-queue";
 
 export default function Home() {
   const [Queue, setQueue] = useState([]);
   const [selectedFloor, setSelectedFloor] = useState(0);
+  const [currentFloor, setCurrentFloor] = useState(0);
+  const [showFloorNumbers, setShowFloorNumbers] = useState(false);
 
   {
-/*
-    0 for UP
-    1 for DOWN
-
+    /*
     New floor will be added at the end
     Floor will be removed from start 
 */
   }
 
-  const move = () => {
-    let queue = [...Queue]
-    queue.push(selectedFloor)
-    setQueue(queue);
+  const move = (onFloor = null) => {
+    let queue = [...Queue];
+    console.log(queue);
+    const moveNext = () => {
+      if (queue.length > 0) {
+        let floor = queue.shift();
+        console.log("1 = ",queue)
+        queue.sort();
+        if (queue.length > 0 && floor > queue[0]) {
+          queue.reverse();
+        }
+        setCurrentFloor(floor);
+        // setQueue(queue)
+        setTimeout(() => {
+          console.log("2 = ",queue)
+          moveNext();
+        }, [5000]);
+      } else {
+        setQueue(queue);
+      }
+      console.log("3 = ",queue)
+    };
+    moveNext();
   };
 
-  console.log(Queue," ",selectedFloor)
+  useEffect(() => {
+    if (Queue.length > 0) move();
+  }, [Queue]);
+
+  console.log(Queue, " ", currentFloor);
 
   return (
     <main className="min-h-screen bg-[#faf7f5] w-full">
       <div className="h-screen w-full relative">
-        {/* contains Floor numbers logic */}
-        <div className="w-1/5 absolute left-30 bg-red-100 space-y-[120px] px-8 h-screen">
+        <div className="w-1/5 absolute left-30 space-y-[80px] px-8 h-screen pt-[100px]">
           {Array.from({ length: 4 }).map((_, index) => {
             const reversedIndex = 3 - index;
             return (
-              <button
-                key={index}
-                onClick={() => {
-                  console.log("reverse = ",reversedIndex)
-                  setSelectedFloor(reversedIndex)}}
-                className={`${
-                  selectedFloor === reversedIndex
-                    ? "border-4 border-red-300"
-                    : ""
-                } flex justify-center border rounded-full p-4 border-black font-bold text-xl text-black`}
-              >
-                {reversedIndex === 0 ? "G" : reversedIndex}
-              </button>
+              <div key={index} className="flex flex-row space-x-2">
+                <button
+                  key={index}
+                  onClick={() => {
+                    let queue = [...Queue];
+                    queue.push(reversedIndex);
+                    setQueue(queue);
+                  }}
+                  className={`${
+                    currentFloor === reversedIndex
+                      ? "border-4 border-red-300"
+                      : ""
+                  } ${
+                    Queue.includes(reversedIndex) ? "bg-red-100" : ""
+                  } flex justify-center border rounded-full p-4 border-black font-bold text-xl text-black`}
+                >
+                  {reversedIndex === 0 ? "G" : reversedIndex}
+                </button>
+              </div>
             );
           })}
         </div>
 
         {/* contains lift logic */}
-        <div className="flex justify-center absolute right-0 bottom-0  w-4/5 h-screen flex-grow">
+        <div className="flex justify-center absolute right-0 bottom-0 w-4/5 h-screen flex-grow">
           <div
-            className="flex flex-row justify-center bg-red-600 space-x-5 absolute bottom- px-4"
+            className="flex flex-row justify-center  space-x-5 absolute bottom- px-4"
             style={{
+              bottom: `${currentFloor * 120}px`,
+              transition: "bottom 4s ease",
               height: `calc(100% - 120px * ${
                 Array.from({ length: 4 }).length
               })`,
             }}
           >
-            <button
-              onClick={() => move()}
-              className="flex h-[10vh] items-center text-black justify-center border border-black rounded-xl px-4 py-2"
-            >
-              <ArrowUp />
-            </button>
             <div className="">
               <svg
-                width="150"
+                width="250"
                 height="150"
                 viewBox="0 0 64 64"
                 fill="none"
@@ -261,12 +285,6 @@ export default function Home() {
                 </g>
               </svg>
             </div>
-            <button
-              onClick={() => move()}
-              className="flex h-[10vh] items-center text-black justify-center border border-black rounded-xl px-4 py-2"
-            >
-              <ArrowDown />
-            </button>
           </div>
         </div>
       </div>
