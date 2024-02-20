@@ -1,6 +1,5 @@
 import { ArrowUp, ArrowDown, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
-import { MinPriorityQueue } from "@datastructures-js/priority-queue";
 
 export default function Home() {
   const [Queue, setQueue] = useState([]);
