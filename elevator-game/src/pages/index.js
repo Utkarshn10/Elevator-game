@@ -12,44 +12,56 @@ export default function Home() {
     /*
     New floor will be added at the end
     Floor will be removed from start 
-*/
+
+    3 1 2 
+    */
   }
 
-  const move = (onFloor = null) => {
-    let queue = [...Queue];
+  const move = (queue) => {
     console.log(queue);
     const moveNext = () => {
       if (queue.length > 0) {
         let floor = queue.shift();
-        console.log("1 = ",queue)
-        queue.sort();
-        if (queue.length > 0 && floor > queue[0]) {
-          queue.reverse();
-        }
+        console.log("1 = ", queue, " ", floor);
         setCurrentFloor(floor);
-        // setQueue(queue)
+
+        const timeToNextFloor = Math.abs(floor - currentFloor) * 2000; // Adjust timeout based on the distance between floors
+
         setTimeout(() => {
-          console.log("2 = ",queue)
           moveNext();
-        }, [5000]);
+        }, timeToNextFloor);
       } else {
-        setQueue(queue);
+        setQueue([]);
       }
-      console.log("3 = ",queue)
+      if (queue.length > 1 && currentFloor > queue[0]) {
+        queue.reverse();
+      }
     };
     moveNext();
   };
 
   useEffect(() => {
-    if (Queue.length > 0) move();
+    let sortedQueue = [...Queue].sort((a, b) => a - b); // Sort the queue in ascending order
+    if (sortedQueue.length > 1 && currentFloor > sortedQueue[0]) {
+      sortedQueue.reverse();
+    }
+    console.log(sortedQueue);
+    if (sortedQueue.length > 0) {
+      setTimeout(() => {
+        move(sortedQueue);
+      }, [2000]);
+    }
   }, [Queue]);
-
-  console.log(Queue, " ", currentFloor);
 
   return (
     <main className="min-h-screen bg-[#faf7f5] w-full">
+      <div className="flex justify-center">
+        <h1 className="text-black text-3xl font-bold items-center">
+          Just Lift
+        </h1>
+      </div>
       <div className="h-screen w-full relative">
-        <div className="w-1/5 absolute left-30 space-y-[80px] px-8 h-screen pt-[100px]">
+        <div className="w-1/5 absolute left-30 space-y-[100px] px-8 h-screen pt-[100px]">
           {Array.from({ length: 4 }).map((_, index) => {
             const reversedIndex = 3 - index;
             return (
@@ -77,13 +89,13 @@ export default function Home() {
         </div>
 
         {/* contains lift logic */}
-        <div className="flex justify-center absolute right-0 bottom-0 w-4/5 h-screen flex-grow">
+        <div className="flex justify-start absolute right-0 bottom-0 w-4/5 h-screen flex-grow">
           <div
             className="flex flex-row justify-center  space-x-5 absolute bottom- px-4"
             style={{
-              bottom: `${currentFloor * 120}px`,
-              transition: "bottom 4s ease",
-              height: `calc(100% - 120px * ${
+              bottom: `${currentFloor * 150}px`,
+              transition: "bottom 2s ease",
+              height: `calc(100% - 130px * ${
                 Array.from({ length: 4 }).length
               })`,
             }}

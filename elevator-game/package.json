@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@datastructures-js/priority-queue": "^6.3.1",
+    "embla-carousel-autoplay": "^8.0.0-rc23",
     "lucide-react": "^0.331.0",
     "next": "14.1.0",
     "react": "^18",
